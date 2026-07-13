@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 export const searchFares = async (pickup, dropoff) => {
-    const response = await api.post("/search", {
+    const response = await api.post("/api/search", {
         pickup,
         dropoff,
     });
