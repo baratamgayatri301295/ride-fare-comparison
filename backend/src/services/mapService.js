@@ -1,30 +1,30 @@
 async function geocodeAddress(address) {
     try {
-        console.log("Geocoding:", address);
-
         const response = await axios.get(
-            "https://nominatim.openstreetmap.org/search",
+            "https://us1.locationiq.com/v1/search",
             {
                 params: {
+                    key: process.env.LOCATIONIQ_API_KEY,
                     q: address,
-                    format: "jsonv2",
+                    format: "json",
                     limit: 1,
-                    countrycodes: "in",
-                },
-                headers: {
-                    "User-Agent": "RideFareComparisonApp/1.0 (baratamgayatri15@gmail.com)",
                 },
             }
         );
 
+        if (!response.data || response.data.length === 0) {
+            throw new Error("Address not found");
+        }
+
+        const result = response.data[0];
+
         return {
-            lat: Number(response.data[0].lat),
-            lng: Number(response.data[0].lon),
-            formatted: response.data[0].display_name,
+            lat: Number(result.lat),
+            lng: Number(result.lon),
+            formatted: result.display_name,
         };
     } catch (error) {
-        console.log("Status:", error.response?.status);
-        console.log("Body:", error.response?.data);
+        console.error("LocationIQ Error:", error.response?.data || error.message);
         throw error;
     }
 }
