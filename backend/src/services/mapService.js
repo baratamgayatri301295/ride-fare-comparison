@@ -1,3 +1,6 @@
+const axios = require("axios");
+
+// Convert address to coordinates using LocationIQ
 async function geocodeAddress(address) {
     try {
         const response = await axios.get(
@@ -28,3 +31,31 @@ async function geocodeAddress(address) {
         throw error;
     }
 }
+
+// Calculate distance using OSRM
+async function getDistance(pickup, dropoff) {
+    try {
+        const url = `https://router.project-osrm.org/route/v1/driving/${pickup.lng},${pickup.lat};${dropoff.lng},${dropoff.lat}?overview=false`;
+
+        const response = await axios.get(url);
+
+        if (!response.data.routes || response.data.routes.length === 0) {
+            throw new Error("Route not found");
+        }
+
+        const route = response.data.routes[0];
+
+        return {
+            distance: route.distance / 1000,
+            duration: route.duration / 60,
+        };
+    } catch (error) {
+        console.error("Distance Error:", error.message);
+        throw error;
+    }
+}
+
+module.exports = {
+    geocodeAddress,
+    getDistance,
+};
